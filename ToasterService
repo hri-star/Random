@@ -1,0 +1,203 @@
+import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
+import { NavigationEnd, Router, NavigationStart } from '@angular/router';
+import { filter } from 'rxjs/operators';
+
+
+@Injectable()
+export class ToasterService {
+  private previousUrl: string = undefined;
+  private currentUrl: string = undefined;
+
+  constructor(private _toastr: ToastrService, private _router: Router) {
+    this.currentUrl = _router.url;
+    _router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+      this.previousUrl = this.currentUrl;
+      this.currentUrl = event.url;
+      this.closeToasterAfterRouteChange();
+    });
+  }
+
+  private closeToasterAfterRouteChange() {
+    if (this.previousUrl && this.currentUrl) {
+      var previousUrlSplit = this.previousUrl.split("/");
+      var currentUrlSplit = this.currentUrl.split("/");
+
+      if (previousUrlSplit.length >= 2 && currentUrlSplit.length >= 2) {
+        if (previousUrlSplit[1] != currentUrlSplit[1]) {
+          this.closeAllToasts();
+        }
+      } else {
+        this.closeAllToasts();
+      }
+    } else {
+      this.closeAllToasts();
+    }
+  }
+
+
+  public showSuccess(message: string, title?: string, individualConfig?: Partial<IndividualConfig>): void {
+    this._toastr.success(message, title, individualConfig);
+  }
+
+  public showError(message: string, title?: string, individualConfig?: Partial<IndividualConfig>): void {
+    this._toastr.error(message, title, individualConfig);
+  }
+
+  public showWarning(message: string, title?: string, individualConfig?: Partial<IndividualConfig>): void {
+    this._toastr.warning(message, title, individualConfig);
+  }
+
+  public showInfo(message: string, title?: string, individualConfig?: Partial<IndividualConfig>): void {
+    this._toastr.info(message, title, individualConfig);
+  }
+
+  public showToast(message: string, title?: string, individualConfig?: Partial<IndividualConfig>, toastTypeClass?: ToastTypes | string): void {
+    this._toastr.show(message, title, individualConfig, toastTypeClass);
+  }
+
+  public closeLastToast() {
+    this._toastr.remove(this._toastr.toasts[this._toastr.toasts.length - 1].toastId);
+  }
+
+  public closeAllToasts() {
+    this._toastr.clear();
+  }
+
+  public changeGlobalConfig(config: Partial<GlobalConfig>) {
+    Object.assign(this._toastr.toastrConfig, config);
+  }
+}
+
+export enum ToastTypes {
+  success = 'toast-success',
+  error = 'toast-error',
+  warning = 'toast-warning',
+  info = 'toast-info'
+}
+
+export declare type ProgressAnimationType = 'increasing' | 'decreasing';
+
+export interface ComponentType<T> {
+  new(...args: any[]): T;
+}
+
+export interface ToastrIconClasses {
+  error: string;
+  info: string;
+  success: string;
+  warning: string;
+}
+
+export interface IndividualConfig {
+  /**
+   * disable both timeOut and extendedTimeOut
+   * default: false
+   */
+  disableTimeOut: boolean;
+  /**
+   * toast time to live in milliseconds
+   * default: 5000
+   */
+  timeOut: number;
+  /**
+   * toast show close button
+   * default: false
+   */
+  closeButton: boolean;
+  /**
+   * time to close after a user hovers over toast
+   * default: 1000
+   */
+  extendedTimeOut: number;
+  /**
+   * show toast progress bar
+   * default: false
+   */
+  progressBar: boolean;
+  /**
+   * changes toast progress bar animation
+   * default: decreasing
+   */
+  progressAnimation: ProgressAnimationType;
+  /**
+   * render html in toast message (possibly unsafe)
+   * default: false
+   */
+  enableHtml: boolean;
+  /**
+   * css class on toast component
+   * default: toast
+   */
+  toastClass: string;
+  /**
+   * css class on toast container
+   * default: toast-top-right
+   */
+  positionClass: string;
+  /**
+   * css class on toast title
+   * default: toast-title
+   */
+  titleClass: string;
+  /**
+   * css class on toast message
+   * default: toast-message
+   */
+  messageClass: string;
+  /**
+   * animation easing on toast
+   * default: ease-in
+   */
+  easing: string;
+  /**
+   * animation ease time on toast
+   * default: 300
+   */
+  easeTime: string | number;
+  /**
+   * clicking on toast dismisses it
+   * default: true
+   */
+  tapToDismiss: boolean;
+  /**
+   * Angular toast component to be shown
+   * default: Toast
+   */
+  toastComponent?: ComponentType<any>;
+  /**
+   * Helps show toast from a websocket or from event outside Angular
+   * default: false
+   */
+  onActivateTick: boolean;
+}
+
+export interface GlobalConfig extends IndividualConfig {
+  /**
+   * max toasts opened. Toasts will be queued
+   * Zero is unlimited
+   * default: 0
+   */
+  maxOpened: number;
+  /**
+   * dismiss current toast when max is reached
+   * default: false
+   */
+  autoDismiss: boolean;
+  iconClasses: Partial<ToastrIconClasses>;
+  /**
+   * New toast placement
+   * default: true
+   */
+  newestOnTop: boolean;
+  /**
+   * block duplicate messages
+   * default: false
+   */
+  preventDuplicates: boolean;
+  /**
+   * Reset toast timeout when there's a duplicate (preventDuplicates needs to be set to true)
+   * default: false
+   */
+  resetTimeoutOnDuplicate: boolean;
+}
