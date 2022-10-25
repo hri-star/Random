@@ -8,6 +8,13 @@ import { filter } from 'rxjs/operators';
 export class ToasterService {
   private previousUrl: string = undefined;
   private currentUrl: string = undefined;
+  
+  const toastrGlobalConfig = {
+  disableTimeOut: false,
+  positionClass: 'toast-bottom-right',
+  closeButton: true,
+  timeOut: 5000
+};
 
   constructor(private _toastr: ToastrService, private _router: Router) {
     this.currentUrl = _router.url;
