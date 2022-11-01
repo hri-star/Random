@@ -1,0 +1,35 @@
+@import '_variables.scss';
+
+// Scrollbar customiztation for Webkit browsers
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  opacity: 1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: $light-gray-color;
+}
+
+// Scrollbar customiztation for FF
+div {
+  scrollbar-color: $light-gray-color white;
+  scrollbar-width: thin;
+}
+
+.hide-scrollbar {
+  overflow: hidden !important;
+  padding-right: 7px;
+}
+
+.hide-scrollbar:hover {
+  overflow: scroll !important;
+  padding-right: 0px;
+}
+
